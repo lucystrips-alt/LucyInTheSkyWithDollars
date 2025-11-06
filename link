@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Opening in Browser...</title>
+    <style>
+        body {
+            font-family: -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+        }
+        h1 { margin-bottom: 20px; }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .steps {
+            margin-top: 30px;
+            text-align: left;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Open in Your Browser</h1>
+        <p>For the best experience, please open this link in Safari or Chrome</p>
+        
+        <a href="https://linktr.ee/lucylaced" class="button">Open Link</a>
+        
+        <div class="steps">
+            <p><strong>On Instagram:</strong></p>
+            <p>1. Tap the three dots (...) at the top<br>
+            2. Select "Open in Browser"</p>
+        </div>
+    </div>
+    
+    <script>
+        // Detect if in Instagram in-app browser
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isInstagram = (ua.indexOf('Instagram') > -1);
+        
+        // If NOT in Instagram browser, redirect immediately
+        if (!isInstagram) {
+            window.location.href = 'https://linktr.ee/lucylaced';
+        }
+    </script>
+</body>
+</html>
