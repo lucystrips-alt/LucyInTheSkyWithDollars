@@ -63,7 +63,7 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 .env{position:relative;width:100%;margin:0 auto;height:300px;}
 .envback{position:absolute;left:0;bottom:0;width:100%;height:auto;display:block;filter:drop-shadow(0 12px 16px rgba(60,80,30,.25))}
 .paperclip{position:absolute;left:5%;right:5%;top:0;bottom:calc(var(--eh,300px) * .03);overflow:hidden}
-.paper{position:absolute;left:0;right:0;top:0;margin:0;padding:9% 11% 0;box-sizing:border-box;background:url('img/stamp-paper.png') center/100% 100% no-repeat;color:#111;display:flex;flex-direction:column;gap:4px;filter:drop-shadow(0 6px 10px rgba(80,40,50,.18));transition:transform .25s ease-out;will-change:transform}
+.paper{position:absolute;left:0;right:0;top:0;margin:0;padding:9% 11% 0;box-sizing:border-box;background:url('img/stamp-paper.png') center/100% 100% no-repeat;color:#111;display:flex;flex-direction:column;gap:4px;filter:drop-shadow(0 6px 10px rgba(80,40,50,.18));will-change:transform;backface-visibility:hidden}
 .envfront{position:absolute;left:0;bottom:0;width:100%;padding:0;border:0;background:none;cursor:pointer;clip-path:polygon(0 0,36.8% 48.7%,61.7% 48.7%,100% 0,100% 100%,0 100%);-webkit-tap-highlight-color:transparent}
 .envfront img{display:block;width:100%;height:auto}
 .envfront .sealx{position:absolute;left:50%;top:32%;width:24%;margin-left:-12%;transform:rotate(-8deg)}
@@ -82,7 +82,7 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 .link.torn{background:url('img/torn-paper.png') center/100% 100% no-repeat;color:#2b2b2b;border:0;border-radius:0;min-height:84px;padding:20px 22px;filter:drop-shadow(0 6px 10px rgba(60,80,40,.22)) drop-shadow(0 1px 1px rgba(0,0,0,.12))}
 .link.torn small{color:#4a4a4a}
 .bookwrap{position:relative;z-index:1;margin-top:-114px}
-.bookslide{position:relative;display:block;width:min(128vw,560px);margin-left:calc(50% - min(128vw,560px) * .77);text-decoration:none;transform:translateX(-105%) rotate(-10deg);transform-origin:0% 60%;transition:transform .2s linear;will-change:transform}
+.bookslide{position:relative;display:block;width:min(128vw,560px);margin-left:calc(50% - min(128vw,560px) * .77);text-decoration:none;transform:translateX(-105%) rotate(-10deg);transform-origin:0% 60%;will-change:transform;backface-visibility:hidden}
 .bookslide img{display:block;width:100%;height:auto;filter:drop-shadow(0 12px 18px rgba(60,40,80,.25))}
 .booktag{position:absolute;left:66%;bottom:-6px;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#2b2b2b;background:rgba(255,255,255,.9);border-radius:999px;padding:8px 14px;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 @media (prefers-reduced-motion:reduce){.bookslide{transform:none;transition:none}}
@@ -304,9 +304,9 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
   var KAJABI_FORM_URL=''; // paste your Kajabi form link here, e.g. https://YOURSITE.mykajabi.com/forms/1234567/form_submissions
   var card=document.getElementById('freecard'), env=document.getElementById('env'), t=document.getElementById('free-toggle'), f=document.getElementById('vault-form'), msg=document.getElementById('kj-msg');
   var isOpen=false;
-  var prog=0, manual=null, eh=300, hp=330, reserve=0, btnB=200;
+  var prog=0, manual=null, eh=300, hp=330, reserve=0, btnB=200, cur=0, vhS=window.innerHeight, lastW=0, raf=0;
   function layout(){
-    var w=env.clientWidth; eh=w*863/820; hp=Math.round(eh*1.12);
+    var w=env.clientWidth; if(w===lastW) return; lastW=w; vhS=window.innerHeight; eh=w*863/820; hp=Math.round(eh*1.12);
     f.style.height=hp+'px';
     var sb=f.querySelector('.send'); btnB=sb.offsetTop+sb.offsetHeight+4;
     reserve=Math.max(0, btnB - 0.62*eh + 8);
@@ -314,23 +314,25 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
     place();
   }
   function place(){
-    var p=manual!==null?manual:prog;
+    var p=cur;
     var closedTop=reserve+0.32*eh, openTop=reserve+0.62*eh-btnB;
-    f.style.transform='translateY('+(closedTop+(openTop-closedTop)*p)+'px)';
+    f.style.transform='translate3d(0,'+(closedTop+(openTop-closedTop)*p).toFixed(2)+'px,0)';
     var o=p>0.6; if(o!==isOpen){ isOpen=o; card.classList.toggle('open',o); t.setAttribute('aria-expanded',String(o));
       f.querySelectorAll('input,button').forEach(function(el){ el.tabIndex=o?0:-1; }); }
   }
-  t.addEventListener('click',function(){ manual=isOpen?0:1; place(); });
-  window.addEventListener('resize',layout);
+  function tick(){ raf=0; var target=manual!==null?manual:prog; cur+= (target-cur)*0.12; if(Math.abs(target-cur)<0.001) cur=target; place(); if(cur!==target) raf=requestAnimationFrame(tick); }
+  function go(){ if(!raf) raf=requestAnimationFrame(tick); }
+  t.addEventListener('click',function(){ manual=isOpen?0:1; go(); });
+  window.addEventListener('resize',function(){ layout(); check(); });
   layout();
   // the paper slowly rises halfway out as the envelope scrolls up, and sinks back in when they scroll up
-  function check(){ var r=env.getBoundingClientRect(), vh=window.innerHeight;
+  function check(){ var r=env.getBoundingClientRect(), vh=vhS;
     var envTop=r.top+reserve; prog=Math.min(1,Math.max(0,(vh*0.92-envTop)/(vh*0.5)));
     if(manual!==null && Math.abs(manual-prog)<0.05) manual=null;
-    place(); }
-  function onS(){ manual=null; requestAnimationFrame(check); }
+    go(); }
+  function onS(){ manual=null; check(); }
   window.addEventListener('scroll',onS,{passive:true});
-  check();
+  check(); cur=prog; place();
   if(KAJABI_FORM_URL) f.action=KAJABI_FORM_URL;
   f.addEventListener('submit',function(e){
     var em=document.getElementById('kj-email');
@@ -340,21 +342,17 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
   });
 })();
 
-// planner book glides in with the scroll: the further you scroll, the further it slides (and back out when you scroll up)
+// planner book glides in smoothly as you scroll to it, then stays out
 (function(){
   var bk=document.getElementById('bookslide'), bw=document.getElementById('bookwrap'); if(!bk) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){ bk.style.transform='none'; return; }
-  var best=0;
-  function upd(){
-    var r=bw.getBoundingClientRect(), vh=window.innerHeight;
-    // 0 when the book's spot first peeks up from the bottom, 1 once it reaches the upper-middle of the screen
-    var p=Math.min(1,Math.max(0,(vh*0.98 - r.top)/(vh*0.72)));
-    p=Math.max(p,best); best=p; // once it's out, it stays out
-    var e=p*p*(3-2*p);
-    bk.style.transform='translateX('+(-105*(1-e))+'%) rotate('+(-10*(1-e))+'deg)';
-  }
-  window.addEventListener('scroll',function(){ requestAnimationFrame(upd); },{passive:true});
-  window.addEventListener('resize',upd); upd();
+  var best=0, cur=0, raf=0, vhS=window.innerHeight, lastW=window.innerWidth;
+  function draw(){ var e=cur*cur*(3-2*cur); bk.style.transform='translate3d('+(-105*(1-e)).toFixed(2)+'%,0,0) rotate('+(-10*(1-e)).toFixed(2)+'deg)'; }
+  function tick(){ raf=0; cur+=(best-cur)*0.1; if(Math.abs(best-cur)<0.001) cur=best; draw(); if(cur!==best) raf=requestAnimationFrame(tick); }
+  function target(){ var r=bw.getBoundingClientRect(); var p=Math.min(1,Math.max(0,(vhS*0.98 - r.top)/(vhS*0.72))); if(p>best){ best=p; if(!raf) raf=requestAnimationFrame(tick); } }
+  window.addEventListener('scroll',target,{passive:true});
+  window.addEventListener('resize',function(){ if(window.innerWidth!==lastW){ lastW=window.innerWidth; vhS=window.innerHeight; } target(); });
+  target(); cur=best; draw();
 })();
 </script>
 </body>
