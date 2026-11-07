@@ -312,6 +312,12 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
 
 // Free card: the sign-up paper slides up out of the envelope on scroll (or tap)
 
+function sendToList(email,name,source){
+  var url='https://a.klaviyo.com/client/subscriptions/?company_id=TD6a9r';
+  var body={data:{type:'subscription',attributes:{custom_source:source,profile:{data:{type:'profile',attributes:{email:email,first_name:name||undefined}}}},relationships:{list:{data:{type:'list',id:'Vbq2qd'}}}}};
+  return fetch(url,{method:'POST',headers:{'revision':'2024-10-15','Content-Type':'application/vnd.api+json'},body:JSON.stringify(body)})
+    .then(function(r){ if(!r.ok && r.status!==202) throw new Error('bad'); });
+}
 function inboxLink(email){
   var d=(email.split('@')[1]||'').toLowerCase(), ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
   if(/^(gmail|googlemail)\.com$/.test(d)) return ios?'googlegmail://':'https://mail.google.com/mail/u/0/#inbox';
@@ -328,7 +334,7 @@ function showConfirm(form,email){
   box.querySelector('a').href=inboxLink(email);
 }
 (function(){
-  var KAJABI_FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // Kit form: Inner Circle
+  var KAJABI_FORM_URL=''; // sign-ups go to Klaviyo (Inner Circle list)
   var card=document.getElementById('freecard'), env=document.getElementById('env'), t=document.getElementById('free-toggle'), f=document.getElementById('vault-form'), msg=document.getElementById('kj-msg');
   var isOpen=false;
   var prog=0, manual=null, eh=300, hp=330, reserve=0, btnB=200, cur=0, vhS=window.innerHeight, lastW=0, raf=0;
@@ -360,14 +366,13 @@ function showConfirm(form,email){
   function onS(){ manual=null; check(); }
   window.addEventListener('scroll',onS,{passive:true});
   check(); cur=prog; place();
-  f.action=KAJABI_FORM_URL;
   f.addEventListener('submit',function(e){
     e.preventDefault();
     var em=document.getElementById('kj-email'), nm=document.getElementById('kj-name'), btn=f.querySelector('.send');
     if(!em.value || !em.checkValidity()){ msg.textContent='Add a real email.'; em.focus(); return; }
     btn.disabled=true; msg.textContent='sending\u2026';
     var body=new URLSearchParams(); body.append('email_address',em.value.trim()); body.append('fields[first_name]',nm.value.trim());
-    fetch(KAJABI_FORM_URL,{method:'POST',mode:'no-cors',body:body})
+    sendToList(em.value.trim(),nm.value.trim(),'lucysclub.com links - inner circle')
       .then(function(){ msg.textContent=''; showConfirm(f,em.value.trim()); })
       .catch(function(){ msg.textContent='hmm, that didn\u2019t go through. try again?'; })
       .then(function(){ btn.disabled=false; });

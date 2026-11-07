@@ -69,6 +69,12 @@ h1{margin:0;font-family:'Modak',sans-serif;font-weight:400;font-size:clamp(76px,
 <p class="foot">© 2026 Lucy in the Sky with Dollars LLC</p>
 </main>
 <script>
+function sendToList(email,name,source){
+  var url='https://a.klaviyo.com/client/subscriptions/?company_id=TD6a9r';
+  var body={data:{type:'subscription',attributes:{custom_source:source,profile:{data:{type:'profile',attributes:{email:email,first_name:name||undefined}}}},relationships:{list:{data:{type:'list',id:'Vbq2qd'}}}}};
+  return fetch(url,{method:'POST',headers:{'revision':'2024-10-15','Content-Type':'application/vnd.api+json'},body:JSON.stringify(body)})
+    .then(function(r){ if(!r.ok && r.status!==202) throw new Error('bad'); });
+}
 function inboxLink(email){
   var d=(email.split('@')[1]||'').toLowerCase(), ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
   if(/^(gmail|googlemail)\.com$/.test(d)) return ios?'googlegmail://':'https://mail.google.com/mail/u/0/#inbox';
@@ -85,7 +91,7 @@ function showConfirm(form,email){
   box.querySelector('a').href=inboxLink(email);
 }
 (function(){
-  var FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // email list (switch to Klaviyo later)
+  // sign-ups go to Klaviyo (Inner Circle list)
   var f=document.getElementById('wl'), msg=document.getElementById('wl-msg');
   f.addEventListener('submit',function(e){
     e.preventDefault();
@@ -93,7 +99,7 @@ function showConfirm(form,email){
     if(!em.value||!em.checkValidity()){ msg.textContent='Add a real email.'; em.focus(); return; }
     btn.disabled=true; msg.textContent='saving…';
     var b=new URLSearchParams(); b.append('email_address',em.value.trim()); b.append('fields[first_name]',nm.value.trim());
-    fetch(FORM_URL,{method:'POST',mode:'no-cors',body:b})
+    sendToList(em.value.trim(),nm.value.trim(),'lucysclub.com shop waitlist')
       .then(function(){ msg.textContent=''; showConfirm(f,em.value.trim()); })
       .catch(function(){ msg.textContent='hmm, that didn\u2019t go through. try again?'; })
       .then(function(){ btn.disabled=false; });
