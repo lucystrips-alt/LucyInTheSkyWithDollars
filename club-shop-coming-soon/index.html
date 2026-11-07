@@ -26,6 +26,12 @@ h1{margin:0;font-family:'Modak',sans-serif;font-weight:400;font-size:clamp(76px,
 .wl input:focus{border-color:#ec8db2;box-shadow:0 0 0 3px rgba(236,141,178,.3)}
 .wl button{min-height:52px;border:0;border-radius:999px;font:700 14px 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4a1630;cursor:pointer;background:radial-gradient(ellipse 80% 130% at 28% 8%,#ffe9f1 0%,#fcc4d9 22%,#f6a6c7 50%,#ee8db6 78%,#e07aa5 100%);box-shadow:inset 0 2px 1px rgba(255,255,255,.9),0 8px 18px rgba(210,110,150,.35)}
 .wl button:disabled{opacity:.6}
+.wl .done{flex-direction:column;gap:10px;text-align:center}
+.wl .done p{margin:0;font-size:14px;line-height:1.4;color:#3a4a30;text-align:center}
+.wl .done .big{font-size:20px;font-weight:700;color:#1d2a14}
+.wl .done b{word-break:break-all;color:#1d2a14}
+.wl .done .tiny{font-size:12px;opacity:.8}
+.wl .openmail{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:999px;text-decoration:none;font:700 14px 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4a1630;background:radial-gradient(ellipse 80% 130% at 28% 8%,#ffe9f1 0%,#fcc4d9 22%,#f6a6c7 50%,#ee8db6 78%,#e07aa5 100%);box-shadow:inset 0 2px 1px rgba(255,255,255,.9),0 8px 18px rgba(210,110,150,.35)}
 .wl .msg{min-height:18px;font-weight:700;color:#1d2a14}
 .back{margin-top:10px;display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:0 24px;border-radius:999px;background:#fff;color:#111;border:1.5px solid #111;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 14px rgba(0,0,0,.12)}
 .back:focus-visible{outline:3px solid #ec8db2;outline-offset:3px}
@@ -52,11 +58,32 @@ h1{margin:0;font-family:'Modak',sans-serif;font-weight:400;font-size:clamp(76px,
 <input id="wl-email" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email" required>
 <button type="submit">Save my spot</button>
 <p class="msg" id="wl-msg" role="status"></p>
+<div class="done" style="display:none">
+<p class="big">Almost in 💌</p>
+<p>Check your email to confirm. We sent a link to <b class="who"></b>.</p>
+<a class="openmail" href="#" target="_blank" rel="noopener">Take me to my email</a>
+<p class="tiny">Don't see it? Check spam or promotions.</p>
+</div>
 </form>
 <a class="back" href="/">← back to my links</a>
 <p class="foot">© 2026 Lucy in the Sky with Dollars LLC</p>
 </main>
 <script>
+function inboxLink(email){
+  var d=(email.split('@')[1]||'').toLowerCase(), ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(/^(gmail|googlemail)\.com$/.test(d)) return ios?'googlegmail://':'https://mail.google.com/mail/u/0/#inbox';
+  if(/^(icloud|me|mac)\.com$/.test(d)) return 'message://';
+  if(/^(outlook|hotmail|live|msn)\./.test(d)) return 'https://outlook.live.com/mail/0/';
+  if(/^(yahoo|ymail)\./.test(d)) return 'https://mail.yahoo.com/';
+  if(/^aol\./.test(d)) return 'https://mail.aol.com/';
+  return ios?'message://':'https://mail.google.com/';
+}
+function showConfirm(form,email){
+  [].forEach.call(form.querySelectorAll('input,button,.msg,h2+p'),function(el){ el.style.display='none'; });
+  var box=form.querySelector('.done'); box.style.display='flex';
+  box.querySelector('.who').textContent=email;
+  box.querySelector('a').href=inboxLink(email);
+}
 (function(){
   var FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // email list (switch to Klaviyo later)
   var f=document.getElementById('wl'), msg=document.getElementById('wl-msg');
@@ -67,7 +94,7 @@ h1{margin:0;font-family:'Modak',sans-serif;font-weight:400;font-size:clamp(76px,
     btn.disabled=true; msg.textContent='saving…';
     var b=new URLSearchParams(); b.append('email_address',em.value.trim()); b.append('fields[first_name]',nm.value.trim());
     fetch(FORM_URL,{method:'POST',mode:'no-cors',body:b})
-      .then(function(){ msg.textContent='you\u2019re on the list. see you at the door.'; f.reset(); })
+      .then(function(){ msg.textContent=''; showConfirm(f,em.value.trim()); })
       .catch(function(){ msg.textContent='hmm, that didn\u2019t go through. try again?'; })
       .then(function(){ btn.disabled=false; });
   });
