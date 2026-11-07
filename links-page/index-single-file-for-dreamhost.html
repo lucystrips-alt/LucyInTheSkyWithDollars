@@ -365,7 +365,7 @@ function showConfirm(form,email){
   f.addEventListener('submit',function(e){
     e.preventDefault();
     var em=document.getElementById('kj-email'), nm=document.getElementById('kj-name'), btn=f.querySelector('.send');
-    if(!em.value || !em.checkValidity()){ msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
+    if(!em.value || !em.checkValidity()){ msg.textContent='Add a real email.'; em.focus(); return; }
     btn.disabled=true; msg.textContent='sending\u2026';
     var body=new URLSearchParams(); body.append('email_address',em.value.trim()); body.append('fields[first_name]',nm.value.trim());
     fetch(KAJABI_FORM_URL,{method:'POST',mode:'no-cors',body:body})

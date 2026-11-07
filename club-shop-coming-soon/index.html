@@ -90,7 +90,7 @@ function showConfirm(form,email){
   f.addEventListener('submit',function(e){
     e.preventDefault();
     var em=document.getElementById('wl-email'), nm=document.getElementById('wl-name'), btn=f.querySelector('button');
-    if(!em.value||!em.checkValidity()){ msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
+    if(!em.value||!em.checkValidity()){ msg.textContent='Add a real email.'; em.focus(); return; }
     btn.disabled=true; msg.textContent='saving…';
     var b=new URLSearchParams(); b.append('email_address',em.value.trim()); b.append('fields[first_name]',nm.value.trim());
     fetch(FORM_URL,{method:'POST',mode:'no-cors',body:b})
