@@ -136,7 +136,7 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 </button>
 
 <!-- 2. SHOP (stars on the corner) -->
-<a class="link glass" href="https://lucyintheskywithdollars.com" style="position:relative">
+<a class="link glass" href="/shop/" style="position:relative">
 <img src="img/silver-stars.png" alt="" aria-hidden="true" style="position:absolute;left:-14px;top:-22px;width:58px;height:auto;z-index:3">
 <span>Lucy's Club shop<small>Club Laws, Audition Kit + dancer guides</small></span><span class="arr" aria-hidden="true">→</span>
 </a>
@@ -183,8 +183,8 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 <form class="paper" id="vault-form" method="post" target="kj-frame" novalidate>
 <p class="ptitle">the inner circle</p>
 <p class="ptext">secret drops to your inbox.</p>
-<label class="pline"><span>stage name</span><input id="kj-name" name="form_submission[name]" type="text" placeholder="e.g. Lucy" autocomplete="given-name" required tabindex="-1"></label>
-<label class="pline"><span>email</span><input id="kj-email" name="form_submission[email]" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email" required tabindex="-1"></label>
+<label class="pline"><span>stage name</span><input id="kj-name" name="fields[first_name]" type="text" placeholder="e.g. Lucy" autocomplete="given-name" required tabindex="-1"></label>
+<label class="pline"><span>email</span><input id="kj-email" name="email_address" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email" required tabindex="-1"></label>
 <button class="send" type="submit" tabindex="-1">let me in</button>
 <p class="pmsg" id="kj-msg" role="status"></p>
 </form>
@@ -301,7 +301,7 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
 
 // Free card: the sign-up paper slides up out of the envelope on scroll (or tap)
 (function(){
-  var KAJABI_FORM_URL=''; // paste your Kajabi form link here, e.g. https://YOURSITE.mykajabi.com/forms/1234567/form_submissions
+  var KAJABI_FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // Kit form: Inner Circle
   var card=document.getElementById('freecard'), env=document.getElementById('env'), t=document.getElementById('free-toggle'), f=document.getElementById('vault-form'), msg=document.getElementById('kj-msg');
   var isOpen=false;
   var prog=0, manual=null, eh=300, hp=330, reserve=0, btnB=200, cur=0, vhS=window.innerHeight, lastW=0, raf=0;
@@ -333,12 +333,17 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
   function onS(){ manual=null; check(); }
   window.addEventListener('scroll',onS,{passive:true});
   check(); cur=prog; place();
-  if(KAJABI_FORM_URL) f.action=KAJABI_FORM_URL;
+  f.action=KAJABI_FORM_URL;
   f.addEventListener('submit',function(e){
-    var em=document.getElementById('kj-email');
-    if(!em.value || !em.checkValidity()){ e.preventDefault(); msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
-    if(!KAJABI_FORM_URL){ e.preventDefault(); msg.textContent='Sign-up opens soon.'; return; }
-    msg.textContent='you\u2019re in. check your inbox.'; setTimeout(function(){ f.reset(); },300);
+    e.preventDefault();
+    var em=document.getElementById('kj-email'), nm=document.getElementById('kj-name'), btn=f.querySelector('.send');
+    if(!em.value || !em.checkValidity()){ msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
+    btn.disabled=true; msg.textContent='sending…';
+    var body=new URLSearchParams(); body.append('email_address',em.value.trim()); body.append('fields[first_name]',nm.value.trim());
+    fetch(KAJABI_FORM_URL,{method:'POST',mode:'no-cors',body:body})
+      .then(function(){ msg.textContent='you\u2019re in. check your inbox.'; f.reset(); })
+      .catch(function(){ msg.textContent='hmm, that didn\u2019t go through. try again?'; })
+      .then(function(){ btn.disabled=false; });
   });
 })();
 
