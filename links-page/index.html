@@ -63,7 +63,6 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 .env{position:relative;width:100%;margin:0 auto;height:300px;}
 .envback{position:absolute;left:0;bottom:0;width:100%;height:auto;display:block;filter:drop-shadow(0 12px 16px rgba(60,80,30,.25))}
 .paperclip{position:absolute;left:5%;right:5%;top:0;bottom:calc(var(--eh,300px) * .03);overflow:hidden}
-.paper{position:absolute;left:0;right:0;top:0;margin:0;padding:9% 11% 0;box-sizing:border-box;background:url('img/stamp-paper.png') center/100% 100% no-repeat;color:#111;display:flex;flex-direction:column;gap:4px;filter:drop-shadow(0 6px 10px rgba(80,40,50,.18));will-change:transform;backface-visibility:hidden}
 .envfront{position:absolute;left:0;bottom:0;width:100%;padding:0;border:0;background:none;cursor:pointer;clip-path:polygon(0 0,36.8% 48.7%,61.7% 48.7%,100% 0,100% 100%,0 100%);-webkit-tap-highlight-color:transparent}
 .envfront img{display:block;width:100%;height:auto}
 .envfront .sealx{position:absolute;left:50%;top:32%;width:24%;margin-left:-12%;transform:rotate(-8deg)}
@@ -87,6 +86,14 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 .booktag{position:absolute;left:66%;bottom:-6px;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#2b2b2b;background:rgba(255,255,255,.9);border-radius:999px;padding:8px 14px;box-shadow:0 4px 10px rgba(0,0,0,.12)}
 @media (prefers-reduced-motion:reduce){.bookslide{transform:none;transition:none}}
 .link.plain{min-height:73px;margin-top:18px;background:#fff;color:#111;border:1.5px solid #111;box-shadow:0 6px 14px rgba(0,0,0,.12)}
+.wl{position:relative;z-index:2;width:100%;margin-top:8px;padding:20px;border-radius:26px;background:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.95);box-shadow:0 10px 26px rgba(80,120,60,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);text-align:left;display:flex;flex-direction:column;gap:10px}
+.wl h2{margin:0;font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;color:#1d2a14}
+.wl p{margin:0;font-size:14px;text-align:center;color:#3a4a30}
+.wl input{width:100%;font:500 16px 'DM Sans',sans-serif;padding:14px 16px;border-radius:16px;border:1.5px solid rgba(29,42,20,.25);background:#fff;color:#111;outline:none}
+.wl input:focus{border-color:#ec8db2;box-shadow:0 0 0 3px rgba(236,141,178,.3)}
+.wl button{min-height:52px;border:0;border-radius:999px;font:700 14px 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4a1630;cursor:pointer;background:radial-gradient(ellipse 80% 130% at 28% 8%,#ffe9f1 0%,#fcc4d9 22%,#f6a6c7 50%,#ee8db6 78%,#e07aa5 100%);box-shadow:inset 0 2px 1px rgba(255,255,255,.9),0 8px 18px rgba(210,110,150,.35)}
+.wl button:disabled{opacity:.6}
+.wl .msg{min-height:18px;font-weight:700;color:#1d2a14}
 .link small{display:block;font-size:14px;font-weight:500;letter-spacing:.01em;line-height:1.3;text-transform:none;opacity:.95;margin-top:3px}
 .link .arr{font-size:20px;line-height:1}
 .link:focus-visible{outline:3px solid #ec8db2;outline-offset:3px}
@@ -175,27 +182,17 @@ h1{margin:0;text-align:center;font-weight:400;font-size:clamp(112px,34vw,150px);
 <span>My Amazon picks<small>Stripper must-haves I actually use</small></span><span class="arr" aria-hidden="true">→</span>
 </a>
 
-<!-- 6. LAST: waitlist paper slides out of the envelope, and back in when you scroll up -->
-<div class="freecard" id="freecard">
-<div class="env" id="env">
-<img class="envback" src="img/envelope-back.png" alt="" aria-hidden="true">
-<div class="paperclip">
-<form class="paper" id="vault-form" method="post" target="kj-frame" novalidate>
-<p class="ptitle">the inner circle</p>
-<p class="ptext">secret drops to your inbox.</p>
-<label class="pline"><span>stage name</span><input id="kj-name" name="fields[first_name]" type="text" placeholder="e.g. Lucy" autocomplete="given-name" required tabindex="-1"></label>
-<label class="pline"><span>email</span><input id="kj-email" name="email_address" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email" required tabindex="-1"></label>
-<button class="send" type="submit" tabindex="-1">let me in</button>
-<p class="pmsg" id="kj-msg" role="status"></p>
+<!-- 6. LAST: inner circle sign-up card -->
+<form class="wl" id="wl" novalidate>
+<h2>The inner circle</h2>
+<p>Secret drops to your inbox.</p>
+<label for="wl-name" style="position:absolute;left:-9999px">Stage name</label>
+<input id="wl-name" type="text" placeholder="stage name" autocomplete="given-name">
+<label for="wl-email" style="position:absolute;left:-9999px">Email</label>
+<input id="wl-email" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email" required>
+<button type="submit">Let me in</button>
+<p class="msg" id="wl-msg" role="status"></p>
 </form>
-</div>
-<button class="envfront" id="free-toggle" type="button" aria-expanded="false" aria-label="Open the envelope to join the inner circle">
-<img src="img/envelope-front.png" alt="">
-</button>
-<img class="envlips" src="img/lipstick-kiss.png" alt="" aria-hidden="true">
-</div>
-<iframe name="kj-frame" title="sign-up" hidden></iframe>
-</div>
 </main>
 
 <!-- socials + copyright stay put on the moss -->
@@ -301,46 +298,15 @@ gate.addEventListener('keydown',function(e){if(e.key==='Escape' && !(inApp&&lock
 
 // Free card: the sign-up paper slides up out of the envelope on scroll (or tap)
 (function(){
-  var KAJABI_FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // Kit form: Inner Circle
-  var card=document.getElementById('freecard'), env=document.getElementById('env'), t=document.getElementById('free-toggle'), f=document.getElementById('vault-form'), msg=document.getElementById('kj-msg');
-  var isOpen=false;
-  var prog=0, manual=null, eh=300, hp=330, reserve=0, btnB=200, cur=0, vhS=window.innerHeight, lastW=0, raf=0;
-  function layout(){
-    var w=env.clientWidth; if(w===lastW) return; lastW=w; vhS=window.innerHeight; eh=w*863/820; hp=Math.round(eh*1.12);
-    f.style.height=hp+'px';
-    var sb=f.querySelector('.send'); btnB=sb.offsetTop+sb.offsetHeight+4;
-    reserve=Math.max(0, btnB - 0.62*eh + 8);
-    env.style.setProperty('--eh',eh+'px'); env.style.height=(reserve+eh)+'px';
-    place();
-  }
-  function place(){
-    var p=cur;
-    var closedTop=reserve+0.32*eh, openTop=reserve+0.62*eh-btnB;
-    f.style.transform='translate3d(0,'+(closedTop+(openTop-closedTop)*p).toFixed(2)+'px,0)';
-    var o=p>0.6; if(o!==isOpen){ isOpen=o; card.classList.toggle('open',o); t.setAttribute('aria-expanded',String(o));
-      f.querySelectorAll('input,button').forEach(function(el){ el.tabIndex=o?0:-1; }); }
-  }
-  function tick(){ raf=0; var target=manual!==null?manual:prog; cur+= (target-cur)*0.12; if(Math.abs(target-cur)<0.001) cur=target; place(); if(cur!==target) raf=requestAnimationFrame(tick); }
-  function go(){ if(!raf) raf=requestAnimationFrame(tick); }
-  t.addEventListener('click',function(){ manual=isOpen?0:1; go(); });
-  window.addEventListener('resize',function(){ layout(); check(); });
-  layout();
-  // the paper slowly rises halfway out as the envelope scrolls up, and sinks back in when they scroll up
-  function check(){ var r=env.getBoundingClientRect(), vh=vhS;
-    var envTop=r.top+reserve; prog=Math.min(1,Math.max(0,(vh*0.92-envTop)/(vh*0.5)));
-    if(manual!==null && Math.abs(manual-prog)<0.05) manual=null;
-    go(); }
-  function onS(){ manual=null; check(); }
-  window.addEventListener('scroll',onS,{passive:true});
-  check(); cur=prog; place();
-  f.action=KAJABI_FORM_URL;
+  var FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // email list (switch to Klaviyo later)
+  var f=document.getElementById('wl'), msg=document.getElementById('wl-msg'); if(!f) return;
   f.addEventListener('submit',function(e){
     e.preventDefault();
-    var em=document.getElementById('kj-email'), nm=document.getElementById('kj-name'), btn=f.querySelector('.send');
-    if(!em.value || !em.checkValidity()){ msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
-    btn.disabled=true; msg.textContent='sending…';
-    var body=new URLSearchParams(); body.append('email_address',em.value.trim()); body.append('fields[first_name]',nm.value.trim());
-    fetch(KAJABI_FORM_URL,{method:'POST',mode:'no-cors',body:body})
+    var em=document.getElementById('wl-email'), nm=document.getElementById('wl-name'), btn=f.querySelector('button');
+    if(!em.value||!em.checkValidity()){ msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
+    btn.disabled=true; msg.textContent='sending\u2026';
+    var b=new URLSearchParams(); b.append('email_address',em.value.trim()); b.append('fields[first_name]',nm.value.trim());
+    fetch(FORM_URL,{method:'POST',mode:'no-cors',body:b})
       .then(function(){ msg.textContent='you\u2019re in. check your inbox.'; f.reset(); })
       .catch(function(){ msg.textContent='hmm, that didn\u2019t go through. try again?'; })
       .then(function(){ btn.disabled=false; });
