@@ -19,6 +19,14 @@ h1{margin:0;font-family:'Modak',sans-serif;font-weight:400;font-size:clamp(76px,
 .card{width:100%;margin-top:6px;padding:18px 20px;border-radius:26px;background:linear-gradient(180deg,rgba(54,112,62,.9),rgba(84,150,84,.84));border:2px solid rgba(190,255,180,.75);box-shadow:0 0 0 5px rgba(170,245,160,.25),0 0 36px rgba(150,235,140,.55);color:#fff;font-size:15px;line-height:1.5;text-align:left}
 .card b{display:block;font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
 .card ul{margin:0;padding-left:18px}
+.wl{width:100%;margin-top:4px;padding:20px;border-radius:26px;background:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.95);box-shadow:0 10px 26px rgba(80,120,60,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);text-align:left;display:flex;flex-direction:column;gap:10px}
+.wl h2{margin:0;font-size:15px;letter-spacing:.1em;text-transform:uppercase;text-align:center}
+.wl p{margin:0;font-size:14px;text-align:center;color:#3a4a30}
+.wl input{width:100%;font:500 16px 'DM Sans',sans-serif;padding:14px 16px;border-radius:16px;border:1.5px solid rgba(29,42,20,.25);background:#fff;color:#111;outline:none}
+.wl input:focus{border-color:#ec8db2;box-shadow:0 0 0 3px rgba(236,141,178,.3)}
+.wl button{min-height:52px;border:0;border-radius:999px;font:700 14px 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#4a1630;cursor:pointer;background:radial-gradient(ellipse 80% 130% at 28% 8%,#ffe9f1 0%,#fcc4d9 22%,#f6a6c7 50%,#ee8db6 78%,#e07aa5 100%);box-shadow:inset 0 2px 1px rgba(255,255,255,.9),0 8px 18px rgba(210,110,150,.35)}
+.wl button:disabled{opacity:.6}
+.wl .msg{min-height:18px;font-weight:700;color:#1d2a14}
 .back{margin-top:10px;display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:0 24px;border-radius:999px;background:#fff;color:#111;border:1.5px solid #111;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 14px rgba(0,0,0,.12)}
 .back:focus-visible{outline:3px solid #ec8db2;outline-offset:3px}
 .foot{margin-top:18px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
@@ -35,8 +43,35 @@ h1{margin:0;font-family:'Modak',sans-serif;font-weight:400;font-size:clamp(76px,
 <li>The Audition Kit</li>
 <li>Dancer money + hustle guides</li>
 </ul></div>
+<form class="wl" id="wl" novalidate>
+<h2>Join the waitlist</h2>
+<p>Be first in line when the doors open.</p>
+<label class="sr" for="wl-name" style="position:absolute;left:-9999px">Stage name</label>
+<input id="wl-name" type="text" placeholder="stage name" autocomplete="given-name">
+<label class="sr" for="wl-email" style="position:absolute;left:-9999px">Email</label>
+<input id="wl-email" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email" required>
+<button type="submit">Save my spot</button>
+<p class="msg" id="wl-msg" role="status"></p>
+</form>
 <a class="back" href="/">← back to my links</a>
 <p class="foot">© 2026 Lucy in the Sky with Dollars LLC</p>
 </main>
+<script>
+(function(){
+  var FORM_URL='https://app.kit.com/forms/10146966/subscriptions'; // email list (switch to Klaviyo later)
+  var f=document.getElementById('wl'), msg=document.getElementById('wl-msg');
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    var em=document.getElementById('wl-email'), nm=document.getElementById('wl-name'), btn=f.querySelector('button');
+    if(!em.value||!em.checkValidity()){ msg.textContent='Add a real email so I can send it.'; em.focus(); return; }
+    btn.disabled=true; msg.textContent='saving…';
+    var b=new URLSearchParams(); b.append('email_address',em.value.trim()); b.append('fields[first_name]',nm.value.trim());
+    fetch(FORM_URL,{method:'POST',mode:'no-cors',body:b})
+      .then(function(){ msg.textContent='you\u2019re on the list. see you at the door.'; f.reset(); })
+      .catch(function(){ msg.textContent='hmm, that didn\u2019t go through. try again?'; })
+      .then(function(){ btn.disabled=false; });
+  });
+})();
+</script>
 </body>
 </html>
